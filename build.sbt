@@ -1,4 +1,4 @@
-name := "ordered-map"
+name := "linked-map"
 
 // shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
 import sbtcrossproject.crossProject
@@ -40,16 +40,16 @@ val flagsFor12 = Seq(
 
 lazy val root = project
   .in(file("."))
-  .aggregate(orderedMapJS, orderedMapJVM)
+  .aggregate(linkedMapJs, linkedMapJVM)
   .settings(
     publish := {},
     publishLocal := {}
   )
 
-lazy val orderedMap = crossProject(JSPlatform, JVMPlatform)
+lazy val linkedMap = crossProject(JSPlatform, JVMPlatform)
   .in(file("."))
   .settings(
-    name := "ordered-map",
+    name := "linked-map",
     version := "0.1.0-SNAPSHOT",
     scalacOptions ++= Seq(
       "-encoding",
@@ -90,10 +90,10 @@ lazy val benchmark = crossProject(JSPlatform, JVMPlatform)
       "com.storm-enroute" %% "scalameter" % "0.8.2" % Test
     )
   )
-  .dependsOn(orderedMap)
+  .dependsOn(linkedMap)
 
-lazy val orderedMapJVMBenchmark = benchmark.jvm
-lazy val orderedMapJSBenchmark = benchmark.js
+lazy val linkedMapJVMBenchmark = benchmark.jvm
+lazy val linkedMapJsBenchmark = benchmark.js
 
-lazy val orderedMapJVM = orderedMap.jvm
-lazy val orderedMapJS = orderedMap.js
+lazy val linkedMapJVM = linkedMap.jvm
+lazy val linkedMapJs = linkedMap.js

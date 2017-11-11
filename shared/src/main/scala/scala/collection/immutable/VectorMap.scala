@@ -25,7 +25,7 @@ import scala.collection.parallel.immutable.ParHashMap
 class VectorMap[A, +B](private val fields: Vector[A],
                        private val underlying: Map[A, (Int, B)])
     extends AbstractMap[A, B]
-    with OrderedMap[A, B]
+    with LinkedMap[A, B]
     with Map[A, B]
     with MapLike[A, B, VectorMap[A, B]]
     with Serializable
@@ -144,7 +144,7 @@ class VectorMap[A, +B](private val fields: Vector[A],
 
 object VectorMap extends ImmutableMapFactory[VectorMap] {
   implicit def canBuildFrom[A, B]
-    : CanBuildFrom[Coll, (A, B), OrderedMap[A, B]] =
+    : CanBuildFrom[Coll, (A, B), LinkedMap[A, B]] =
     new MapCanBuildFrom[A, B]
 
   override def empty[A, B]: VectorMap[A, B] =
