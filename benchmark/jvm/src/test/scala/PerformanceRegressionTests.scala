@@ -4,9 +4,9 @@ import org.specs2.Specification
 
 import scala.collection.JavaConversions._
 
-class PerformanceRegression extends Specification {
+class PerformanceRegressionTests extends Specification {
 
-  override def is = s2"""Performance Regression tests
+  override def is = s2"""
       firstUnspecialized                         $firstUnspecialized
       """
 
@@ -19,8 +19,8 @@ class PerformanceRegression extends Specification {
     val options = new OptionsBuilder()
       .include(
         jmh.main.FirstUnspecialized.getClass.getSimpleName.dropRight(1) + ".*")
-      .warmupIterations(10)
-      .measurementIterations(10)
+      .warmupIterations(3)
+      .measurementIterations(3)
       .forks(1)
       .threads(1)
       .build()

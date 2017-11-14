@@ -1,6 +1,7 @@
 name := "linked-map"
 
 // shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
+import pl.project13.scala.sbt.JmhPlugin.generateJmhSourcesAndResources
 import sbtcrossproject.crossProject
 
 val currentScalaVersion = "2.11.12"
@@ -87,16 +88,17 @@ lazy val linkedMap = crossProject(JSPlatform, JVMPlatform)
 lazy val benchmark = crossProject(JSPlatform, JVMPlatform)
   .in(file("benchmark"))
   .jvmSettings(
-    libraryDependencies ++= Seq(
-      "org.specs2" %% "specs2-core" % "4.0.0" % Test,
-      "org.openjdk.jmh" % "jmh-generator-annprocess" % "1.19" % Test
-    ),
+    libraryDependencies += {
+      CrossVersion.partialVersion(scalaVersion.value) match {
+        case Some((2, n)) if n == 10 =>
+          "org.specs2" %% "specs2-core" % "3.9.5" % Test
+        case _ => "org.specs2" %% "specs2-core" % "4.0.0" % Test
+      }
+    },
+    // TODO: Is there a better way to do this, we essentially run the benchmarks twice?
+    test in Test := (test in Test dependsOn (run in Jmh).toTask(
+      " -i 3 -wi 3 -f1 -t1")).value,
     fork in Test := true,
-    scalacOptions in Test ++= Seq("-Yrangepos")
-  )
-  .jsSettings(
-    libraryDependencies ++= Seq(
-      "org.specs2" %%% "specs2-core" % "4.0.0" % Test),
     scalacOptions in Test ++= Seq("-Yrangepos")
   )
   .dependsOn(linkedMap)
