@@ -19,8 +19,8 @@ class PerformanceRegressionTests extends Specification {
     val options = new OptionsBuilder()
       .include(
         jmh.main.FirstUnspecialized.getClass.getSimpleName.dropRight(1) + ".*")
-      .warmupIterations(3)
-      .measurementIterations(3)
+      .warmupIterations(10)
+      .measurementIterations(10)
       .forks(1)
       .threads(1)
       .build()

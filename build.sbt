@@ -1,7 +1,6 @@
 name := "linked-map"
 
 // shadow sbt-scalajs' crossProject and CrossType until Scala.js 1.0.0 is released
-import pl.project13.scala.sbt.JmhPlugin.generateJmhSourcesAndResources
 import sbtcrossproject.crossProject
 
 val currentScalaVersion = "2.11.12"
@@ -97,7 +96,7 @@ lazy val benchmark = crossProject(JSPlatform, JVMPlatform)
     },
     // TODO: Is there a better way to do this, we essentially run the benchmarks twice?
     test in Test := (test in Test dependsOn (run in Jmh).toTask(
-      " -i 3 -wi 3 -f1 -t1")).value,
+      " -i 10 -wi 10 -f1 -t1")).value,
     fork in Test := true,
     scalacOptions in Test ++= Seq("-Yrangepos")
   )
