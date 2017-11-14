@@ -66,7 +66,7 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
     def -(key: Any): LinkedMap[Any, Nothing] = this
   }
 
-  class LinkedMap1[A, +B](key1: A, value1: B)
+  final class LinkedMap1[A, +B](key1: A, value1: B)
       extends Map1[A, B](key1, value1)
       with LinkedMap[A, B] {
     override def updated[B1 >: B](key: A, value: B1): LinkedMap[A, B1] =
@@ -78,7 +78,7 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
       if (key == key1) VectorMap.empty else this
   }
 
-  class LinkedMap2[A, +B](key1: A, value1: B, key2: A, value2: B)
+  final class LinkedMap2[A, +B](key1: A, value1: B, key2: A, value2: B)
       extends Map2[A, B](key1, value1, key2, value2)
       with LinkedMap[A, B] {
     override def updated[B1 >: B](key: A, value: B1): LinkedMap[A, B1] =
@@ -93,12 +93,12 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
       else this
   }
 
-  class LinkedMap3[A, +B](key1: A,
-                          value1: B,
-                          key2: A,
-                          value2: B,
-                          key3: A,
-                          value3: B)
+  final class LinkedMap3[A, +B](key1: A,
+                                value1: B,
+                                key2: A,
+                                value2: B,
+                                key3: A,
+                                value3: B)
       extends Map3(key1, value1, key2, value2, key3, value3)
       with LinkedMap[A, B] {
     override def updated[B1 >: B](key: A, value: B1): LinkedMap[A, B1] =
@@ -117,14 +117,14 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
       else this
   }
 
-  class LinkedMap4[A, +B](key1: A,
-                          value1: B,
-                          key2: A,
-                          value2: B,
-                          key3: A,
-                          value3: B,
-                          key4: A,
-                          value4: B)
+  final class LinkedMap4[A, +B](key1: A,
+                                value1: B,
+                                key2: A,
+                                value2: B,
+                                key3: A,
+                                value3: B,
+                                key4: A,
+                                value4: B)
       extends Map4(
         key1,
         value1,
