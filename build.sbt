@@ -20,7 +20,8 @@ autoAPIMappings := true
 val flagsFor10 = Seq(
   "-Xlint",
   "-Yclosure-elim",
-  "-Ydead-code"
+  "-Ydead-code",
+  "-optimize"
 )
 
 val flagsFor11 = Seq(
@@ -29,6 +30,7 @@ val flagsFor11 = Seq(
   "-Ywarn-infer-any",
   "-Yclosure-elim",
   "-Ydead-code",
+  "-optimize",
   "-Xsource:2.12" // required to build case class construction
 )
 
