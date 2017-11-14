@@ -86,6 +86,19 @@ lazy val linkedMap = crossProject(JSPlatform, JVMPlatform)
 
 lazy val benchmark = crossProject(JSPlatform, JVMPlatform)
   .in(file("benchmark"))
+  .jvmSettings(
+    libraryDependencies ++= Seq(
+      "org.specs2" %% "specs2-core" % "4.0.0" % Test,
+      "org.openjdk.jmh" % "jmh-generator-annprocess" % "1.19" % Test
+    ),
+    fork in Test := true,
+    scalacOptions in Test ++= Seq("-Yrangepos")
+  )
+  .jsSettings(
+    libraryDependencies ++= Seq(
+      "org.specs2" %%% "specs2-core" % "4.0.0" % Test),
+    scalacOptions in Test ++= Seq("-Yrangepos")
+  )
   .dependsOn(linkedMap)
 
 lazy val linkedMapJVMBenchmark = benchmark.jvm.enablePlugins(JmhPlugin)
