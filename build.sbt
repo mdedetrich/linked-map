@@ -84,15 +84,9 @@ lazy val linkedMap = crossProject(JSPlatform, JVMPlatform)
 
 lazy val benchmark = crossProject(JSPlatform, JVMPlatform)
   .in(file("benchmark"))
-  .jvmSettings(
-    testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework"),
-    libraryDependencies ++= Seq(
-      "com.storm-enroute" %% "scalameter" % "0.8.2" % Test
-    )
-  )
   .dependsOn(linkedMap)
 
-lazy val linkedMapJVMBenchmark = benchmark.jvm
+lazy val linkedMapJVMBenchmark = benchmark.jvm.enablePlugins(JmhPlugin)
 lazy val linkedMapJsBenchmark = benchmark.js
 
 lazy val linkedMapJVM = linkedMap.jvm
