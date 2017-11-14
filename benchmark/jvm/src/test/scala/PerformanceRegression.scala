@@ -6,7 +6,7 @@ import scala.collection.JavaConversions._
 
 class PerformanceRegression extends Specification {
 
-  override def is = s2"""Regression tests
+  override def is = s2"""Performance Regression tests
       firstUnspecialized                         $firstUnspecialized
       """
 
