@@ -2,6 +2,7 @@ package jmh.main
 
 import jmh.main.Unary.BenchmarkState
 import org.openjdk.jmh.annotations.{Benchmark, Scope, State}
+import org.openjdk.jmh.infra.Blackhole
 
 import scala.collection.immutable.LinkedMap
 
@@ -20,18 +21,26 @@ object Unary {
 
 class Unary {
   @Benchmark
-  def basicConstructorLinkedMap = {
-    LinkedMap(1 -> 1)
+  def basicConstructorLinkedMap(bh: Blackhole) = {
+    val v = LinkedMap(1 -> 1)
+    bh.consume(v)
   }
 
   @Benchmark
-  def basicConstructorMap = {
-    Map(1 -> 1)
+  def basicConstructorMap(bh: Blackhole) = {
+    val v = Map(1 -> 1)
+    bh.consume(v)
   }
 
   @Benchmark
-  def basicLookupKeyMap(state: BenchmarkState) = state.createdMap(1)
+  def basicLookupKeyMap(bh: Blackhole, state: BenchmarkState) = {
+    val v = state.createdMap(1)
+    bh.consume(v)
+  }
 
   @Benchmark
-  def basicLookupKeyLinkedMap(state: BenchmarkState) = state.createdLinkedMap(1)
+  def basicLookupKeyLinkedMap(bh: Blackhole, state: BenchmarkState) = {
+    val v = state.createdLinkedMap(1)
+    bh.consume(v)
+  }
 }
