@@ -38,3 +38,17 @@ requires access to these classes for performance/code size reasons.
 Linked Map is currently built for Scala 2.10.x, 2.11.x and 2.12.x. 2.13.x is
 under consideration, as it may make more sense to include an implementation
 directly in the Scala Collections redesign
+
+## Performance
+
+There is an including performance `benchmark` project which uses sbt-jmh for the JVM.
+The jmh test harness can be run using `benchmarkJVM:jmh`, see https://github.com/ktoso/sbt-jmh
+for more options.
+
+There is also a performance regression testing suite which can be run when using
+`benchmarkJVM/test` which uses sbt-jmh. This is to make sure that there isn't any
+performance regression when it comes to tests.
+
+In general, we try to aim to not be slower than 50% for all operations compared to
+`scala.collection.immutable.Map`. The ratios for various operations can be seen in the
+`PerformanceRegressionTests` file
