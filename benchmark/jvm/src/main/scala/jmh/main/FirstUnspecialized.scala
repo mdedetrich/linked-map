@@ -2,6 +2,7 @@ package jmh.main
 
 import jmh.main.FirstUnspecialized.BenchmarkState
 import org.openjdk.jmh.annotations.{Benchmark, Scope, State}
+import org.openjdk.jmh.infra.Blackhole
 
 import scala.collection.immutable.LinkedMap
 
@@ -29,27 +30,39 @@ object FirstUnspecialized {
 class FirstUnspecialized {
 
   @Benchmark
-  def basicConstructorMap = Map(
-    1 -> 1,
-    2 -> 2,
-    3 -> 3,
-    4 -> 4,
-    5 -> 5
-  )
+  def basicConstructorMap(bh: Blackhole) = {
+    val v = Map(
+      1 -> 1,
+      2 -> 2,
+      3 -> 3,
+      4 -> 4,
+      5 -> 5
+    )
+    bh.consume(v)
+  }
 
   @Benchmark
-  def basicConstructorLinkedMap(state: BenchmarkState) = LinkedMap(
-    1 -> 1,
-    2 -> 2,
-    3 -> 3,
-    4 -> 4,
-    5 -> 5
-  )
+  def basicConstructorLinkedMap(bh: Blackhole) = {
+    val v = LinkedMap(
+      1 -> 1,
+      2 -> 2,
+      3 -> 3,
+      4 -> 4,
+      5 -> 5
+    )
+    bh.consume(v)
+  }
 
   @Benchmark
-  def basicLookupKeyMap(state: BenchmarkState) = state.createdMap(5)
+  def basicLookupKeyMap(bh: Blackhole, state: BenchmarkState) = {
+    val v = state.createdMap(5)
+    bh.consume(v)
+  }
 
   @Benchmark
-  def basicLookupKeyLinkedMap(state: BenchmarkState) = state.createdLinkedMap(5)
+  def basicLookupKeyLinkedMap(bh: Blackhole, state: BenchmarkState) = {
+    val v = state.createdLinkedMap(5)
+    bh.consume(v)
+  }
 
 }
