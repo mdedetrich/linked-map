@@ -2,7 +2,6 @@ package scala.collection.immutable
 
 import scala.collection.{Iterator, immutable}
 import scala.collection.generic.{CanBuildFrom, ImmutableMapFactory}
-import scala.collection.immutable.Map.{Map1, Map2, Map3, Map4}
 
 /**
   * A generic trait for ordered immutable maps. Concrete classes have to provide
@@ -15,7 +14,7 @@ trait LinkedMap[A, +B]
     extends Map[A, B]
     with Iterable[(A, B)]
     with scala.collection.Map[A, B]
-    with MapLike[A, B, LinkedMap[A, B]] { self =>
+    with MapLike[A, B, LinkedMap[A, B]] {
   override def empty: LinkedMap[A, B] = LinkedMap.empty
 
   override def seq: LinkedMap[A, B] = this
@@ -28,7 +27,7 @@ trait LinkedMap[A, +B]
 
   override def updated[B1 >: B](key: A, value: B1): LinkedMap[A, B1] =
     this + ((key, value))
-  def +[B1 >: B](kv: (A, B1)): LinkedMap[A, B1]
+  override def +[B1 >: B](kv: (A, B1)): LinkedMap[A, B1]
 }
 
 object LinkedMap extends ImmutableMapFactory[LinkedMap] {
@@ -58,17 +57,22 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
       extends AbstractMap[Any, Nothing]
       with LinkedMap[Any, Nothing] {
     override def size: Int = 0
-    def get(key: Any): Option[Nothing] = None
-    def iterator: Iterator[(Any, Nothing)] = Iterator.empty
+    override def get(key: Any): Option[Nothing] = None
+    override def iterator: Iterator[(Any, Nothing)] = Iterator.empty
     override def updated[B1](key: Any, value: B1): LinkedMap[Any, B1] =
       new LinkedMap1(key, value)
-    def +[B1](kv: (Any, B1)): LinkedMap[Any, B1] = updated(kv._1, kv._2)
-    def -(key: Any): LinkedMap[Any, Nothing] = this
+    override def +[B1](kv: (Any, B1)): LinkedMap[Any, B1] = updated(kv._1, kv._2)
+    override def -(key: Any): LinkedMap[Any, Nothing] = this
   }
 
   final class LinkedMap1[A, +B](key1: A, value1: B)
-      extends Map1[A, B](key1, value1)
-      with LinkedMap[A, B] {
+      extends AbstractMap[A, B]
+      with LinkedMap[A, B]
+      with Serializable {
+    override def size = 1
+    override def get(key: A): Option[B] =
+      if (key == key1) Some(value1) else None
+    override def iterator = Iterator((key1, value1))
     override def updated[B1 >: B](key: A, value: B1): LinkedMap[A, B1] =
       if (key == key1) new LinkedMap1(key1, value)
       else new LinkedMap2(key1, value1, key, value)
@@ -76,11 +80,21 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
       updated(kv._1, kv._2)
     override def -(key: A): LinkedMap[A, B] =
       if (key == key1) VectorMap.empty else this
+    override def foreach[U](f: ((A, B)) => U): Unit = {
+      f((key1, value1))
+    }
   }
 
   final class LinkedMap2[A, +B](key1: A, value1: B, key2: A, value2: B)
-      extends Map2[A, B](key1, value1, key2, value2)
-      with LinkedMap[A, B] {
+    extends AbstractMap[A, B]
+      with LinkedMap[A, B]
+      with Serializable {
+    override def size = 2
+    override def get(key: A): Option[B] =
+      if (key == key1) Some(value1)
+      else if (key == key2) Some(value2)
+      else None
+    override def iterator = Iterator((key1, value1), (key2, value2))
     override def updated[B1 >: B](key: A, value: B1): LinkedMap[A, B1] =
       if (key == key1) new LinkedMap2(key1, value, key2, value2)
       else if (key == key2) new LinkedMap2(key1, value1, key2, value)
@@ -91,6 +105,9 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
       if (key == key1) new LinkedMap1(key2, value2)
       else if (key == key2) new LinkedMap1(key1, value1)
       else this
+    override def foreach[U](f: ((A, B)) => U): Unit = {
+      f((key1, value1)); f((key2, value2))
+    }
   }
 
   final class LinkedMap3[A, +B](key1: A,
@@ -99,8 +116,16 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
                                 value2: B,
                                 key3: A,
                                 value3: B)
-      extends Map3(key1, value1, key2, value2, key3, value3)
-      with LinkedMap[A, B] {
+    extends AbstractMap[A, B]
+      with LinkedMap[A, B]
+      with Serializable {
+    override def size = 3
+    override def get(key: A): Option[B] =
+      if (key == key1) Some(value1)
+      else if (key == key2) Some(value2)
+      else if (key == key3) Some(value3)
+      else None
+    override def iterator = Iterator((key1, value1), (key2, value2), (key3, value3))
     override def updated[B1 >: B](key: A, value: B1): LinkedMap[A, B1] =
       if (key == key1) new LinkedMap3(key1, value, key2, value2, key3, value3)
       else if (key == key2)
@@ -115,6 +140,9 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
       else if (key == key2) new LinkedMap2(key1, value1, key3, value3)
       else if (key == key3) new LinkedMap2(key1, value1, key2, value2)
       else this
+    override def foreach[U](f: ((A, B)) => U): Unit = {
+      f((key1, value1)); f((key2, value2)); f((key3, value3))
+    }
   }
 
   final class LinkedMap4[A, +B](key1: A,
@@ -125,17 +153,17 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
                                 value3: B,
                                 key4: A,
                                 value4: B)
-      extends Map4(
-        key1,
-        value1,
-        key2,
-        value2,
-        key3,
-        value3,
-        key4,
-        value4
-      )
-      with LinkedMap[A, B] {
+    extends AbstractMap[A, B]
+      with LinkedMap[A, B]
+      with Serializable {
+    override def size = 4
+    override def get(key: A): Option[B] =
+      if (key == key1) Some(value1)
+      else if (key == key2) Some(value2)
+      else if (key == key3) Some(value3)
+      else if (key == key4) Some(value4)
+      else None
+    override def iterator = Iterator((key1, value1), (key2, value2), (key3, value3), (key4, value4))
     override def updated[B1 >: B](key: A, value: B1): LinkedMap[A, B1] =
       if (key == key1)
         new LinkedMap4(key1, value, key2, value2, key3, value3, key4, value4)
@@ -168,5 +196,8 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
       else if (key == key4)
         new LinkedMap3(key1, value1, key2, value2, key3, value3)
       else this
+    override def foreach[U](f: ((A, B)) => U): Unit = {
+      f((key1, value1)); f((key2, value2)); f((key3, value3)); f((key4, value4))
+    }
   }
 }

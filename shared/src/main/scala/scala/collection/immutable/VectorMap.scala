@@ -31,10 +31,10 @@ class VectorMap[A, +B](private val fields: Vector[A],
     with Serializable
     with CustomParallelizable[(A, B), ParHashMap[A, B]] {
 
-  override def empty: VectorMap[A, Nothing] = VectorMap.empty
+  @inline override def empty: VectorMap[A, Nothing] = VectorMap.empty
 
   override def +[B1 >: B](kv: (A, B1)): VectorMap[A, B1] = {
-    if (underlying.contains(kv._1)) {
+    if (underlying.get(kv._1).isDefined) {
       new VectorMap(
         fields,
         underlying.updated(kv._1, (fields.length, kv._2.asInstanceOf[B])))
@@ -52,7 +52,7 @@ class VectorMap[A, +B](private val fields: Vector[A],
     val originalFieldsLength = fields.length
     var newFieldsCounter = 0
     xs.foreach { value =>
-      if (!underlying.contains(value._1)) {
+      if (underlying.get(value._1).isEmpty) {
         newFieldsCounter += 1
         fieldsBuilder += value._1
         mapBuilder += ((value._1,
@@ -68,7 +68,7 @@ class VectorMap[A, +B](private val fields: Vector[A],
                   underlying ++ mapBuilder.result())
   }
 
-  override def get(key: A): Option[B] = underlying.get(key).map(_._2)
+  @inline override def get(key: A): Option[B] = underlying.get(key).map(_._2)
 
   override def getOrElse[B1 >: B](key: A, default: => B1): B1 =
     underlying.get(key).map(_._2.asInstanceOf[B]).getOrElse(default)
@@ -93,7 +93,7 @@ class VectorMap[A, +B](private val fields: Vector[A],
     }
   }
 
-  override def keys: scala.Iterable[A] = fields.iterator.toIterable
+  @inline override def keys: scala.Iterable[A] = fields.iterator.toIterable
 
   override def values: scala.Iterable[B] = new Iterable[B] {
     override def iterator: Iterator[B] = {
@@ -110,14 +110,14 @@ class VectorMap[A, +B](private val fields: Vector[A],
     }
   }
 
-  override def isEmpty: Boolean = fields.isEmpty
+  @inline override def isEmpty: Boolean = fields.isEmpty
 
-  override def size: Int = fields.size
+  @inline override def size: Int = fields.size
 
-  override def apply(k: A): B = underlying(k)._2
+  @inline override def apply(k: A): B = underlying(k)._2
 
   override def updated[B1 >: B](key: A, value: B1): VectorMap[A, B1] = {
-    if (underlying.contains(key)) {
+    if (underlying.get(key).isDefined) {
       val oldKey = underlying(key)._1
       new VectorMap(fields,
                     underlying.updated(key, (oldKey, value.asInstanceOf[B])))

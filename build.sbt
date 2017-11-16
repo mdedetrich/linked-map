@@ -37,7 +37,8 @@ val flagsFor11 = Seq(
 val flagsFor12 = Seq(
   "-Xlint:_",
   "-Ywarn-infer-any",
-  "-opt-inline-from:<sources>"
+  "-opt-inline-from:<sources>",
+  "-opt:l:method"
 )
 
 lazy val root = project
