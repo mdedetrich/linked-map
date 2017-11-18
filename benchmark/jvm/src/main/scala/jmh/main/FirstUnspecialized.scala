@@ -65,4 +65,16 @@ class FirstUnspecialized {
     bh.consume(v)
   }
 
+  @Benchmark
+  def basicGetKeyMap(bh: Blackhole, state: BenchmarkState) = {
+    val v = state.createdMap.get(5)
+    bh.consume(v)
+  }
+
+  @Benchmark
+  def basicGetKeyLinkedMap(bh: Blackhole, state: BenchmarkState) = {
+    val v = state.createdLinkedMap.get(5)
+    bh.consume(v)
+  }
+
 }
