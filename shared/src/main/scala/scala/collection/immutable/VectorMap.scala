@@ -1,11 +1,7 @@
-package scala.collection.immutable
+package scala
+package collection
+package immutable
 
-import scala.collection.{
-  CustomParallelizable,
-  GenTraversableOnce,
-  Iterator,
-  mutable
-}
 import scala.collection.generic.{CanBuildFrom, ImmutableMapFactory}
 import scala.collection.parallel.immutable.ParHashMap
 
@@ -23,7 +19,7 @@ import scala.collection.parallel.immutable.ParHashMap
 @deprecatedInheritance(
   "The semantics of immutable collections makes inheriting from VectorMap error-prone.")
 class VectorMap[A, +B](private val fields: Vector[A],
-                       private val underlying: Map[A, (Int, B)])
+                       private val underlying: HashMap[A, (Int, B)])
     extends AbstractMap[A, B]
     with LinkedMap[A, B]
     with Map[A, B]
@@ -31,10 +27,13 @@ class VectorMap[A, +B](private val fields: Vector[A],
     with Serializable
     with CustomParallelizable[(A, B), ParHashMap[A, B]] {
 
-  override def empty: VectorMap[A, Nothing] = VectorMap.empty
+  @inline override def default(key: A): B =
+    throw new NoSuchElementException("key not found: " + key)
+
+  @inline override def empty: VectorMap[A, Nothing] = VectorMap.empty
 
   override def +[B1 >: B](kv: (A, B1)): VectorMap[A, B1] = {
-    if (underlying.contains(kv._1)) {
+    if (underlying.get(kv._1).isDefined) {
       new VectorMap(
         fields,
         underlying.updated(kv._1, (fields.length, kv._2.asInstanceOf[B])))
@@ -48,11 +47,11 @@ class VectorMap[A, +B](private val fields: Vector[A],
   override def ++[B1 >: B](
       xs: GenTraversableOnce[(A, B1)]): VectorMap[A, B1] = {
     val fieldsBuilder = Vector.newBuilder[A]
-    val mapBuilder = Map.newBuilder[A, (Int, B)]
+    val mapBuilder = HashMap.newBuilder[A, (Int, B)]
     val originalFieldsLength = fields.length
     var newFieldsCounter = 0
     xs.foreach { value =>
-      if (!underlying.contains(value._1)) {
+      if (underlying.get(value._1).isEmpty) {
         newFieldsCounter += 1
         fieldsBuilder += value._1
         mapBuilder += ((value._1,
@@ -93,7 +92,7 @@ class VectorMap[A, +B](private val fields: Vector[A],
     }
   }
 
-  override def keys: scala.Iterable[A] = fields.iterator.toIterable
+  @inline override def keys: scala.Iterable[A] = fields.iterator.toIterable
 
   override def values: scala.Iterable[B] = new Iterable[B] {
     override def iterator: Iterator[B] = {
@@ -110,14 +109,17 @@ class VectorMap[A, +B](private val fields: Vector[A],
     }
   }
 
-  override def isEmpty: Boolean = fields.isEmpty
+  @inline override def isEmpty: Boolean = fields.isEmpty
 
-  override def size: Int = fields.size
+  @inline override def size: Int = fields.size
 
-  override def apply(k: A): B = underlying(k)._2
+  override def apply(key: A): B = get(key) match {
+    case None        => default(key)
+    case Some(value) => value
+  }
 
   override def updated[B1 >: B](key: A, value: B1): VectorMap[A, B1] = {
-    if (underlying.contains(key)) {
+    if (underlying.get(key).isDefined) {
       val oldKey = underlying(key)._1
       new VectorMap(fields,
                     underlying.updated(key, (oldKey, value.asInstanceOf[B])))
@@ -143,8 +145,7 @@ class VectorMap[A, +B](private val fields: Vector[A],
 }
 
 object VectorMap extends ImmutableMapFactory[VectorMap] {
-  implicit def canBuildFrom[A, B]
-    : CanBuildFrom[Coll, (A, B), LinkedMap[A, B]] =
+  implicit def canBuildFrom[A, B]: CanBuildFrom[Coll, (A, B), LinkedMap[A, B]] =
     new MapCanBuildFrom[A, B]
 
   override def empty[A, B]: VectorMap[A, B] =
@@ -156,7 +157,7 @@ object VectorMap extends ImmutableMapFactory[VectorMap] {
 
 class VectorMapBuilder[A, B] extends mutable.Builder[(A, B), VectorMap[A, B]] {
   private val fieldBuilder = Vector.newBuilder[A]
-  private val underlyingBuilder = Map.newBuilder[A, (Int, B)]
+  private val underlyingBuilder = HashMap.newBuilder[A, (Int, B)]
   private var counter = 0
 
   override def +=(elem: (A, B)): VectorMapBuilder.this.type = {
