@@ -28,6 +28,11 @@ trait LinkedMap[A, +B]
   override def updated[B1 >: B](key: A, value: B1): LinkedMap[A, B1] =
     this + ((key, value))
   override def +[B1 >: B](kv: (A, B1)): LinkedMap[A, B1]
+
+  @inline override def apply(key: A): B = get(key) match {
+    case None => default(key)
+    case Some(value) => value
+  }
 }
 
 object LinkedMap extends ImmutableMapFactory[LinkedMap] {
