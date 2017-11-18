@@ -13,6 +13,7 @@ class PerformanceRegressionTests extends Specification {
   def firstUnspecialized = {
     val ratios = List(
       0.61,
+      0.75,
       0.59
     )
 
