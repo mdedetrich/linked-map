@@ -11,7 +11,7 @@ class PerformanceRegressionTests extends Specification {
       """
 
   def firstUnspecialized = {
-    val ratios = List(
+    val acceptablePerformanceRatios = List(
       0.61,
       0.75,
       0.59
@@ -33,7 +33,7 @@ class PerformanceRegressionTests extends Specification {
     val paired = scores.sliding(2, 2).toList.zipWithIndex
 
     forall(paired)((result: (List[Double], Int)) =>
-      result._1(0) / result._1(1) must beGreaterThan(ratios(result._2)))
+      result._1(0) / result._1(1) must beGreaterThan(acceptablePerformanceRatios(result._2)))
   }
 
 }
