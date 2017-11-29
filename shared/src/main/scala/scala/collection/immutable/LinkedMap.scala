@@ -25,8 +25,9 @@ trait LinkedMap[A, +B]
   override def withDefaultValue[B1 >: B](d: B1): immutable.LinkedMap[A, B1] =
     new LinkedMap.WithDefault[A, B1](this, x => d)
 
-  override def updated[B1 >: B](key: A, value: B1): LinkedMap[A, B1] =
+  @inline override def updated[B1 >: B](key: A, value: B1): LinkedMap[A, B1] =
     this + ((key, value))
+
   override def +[B1 >: B](kv: (A, B1)): LinkedMap[A, B1]
 
   @inline override def apply(key: A): B = get(key) match {
@@ -39,7 +40,7 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
   implicit def canBuildFrom[A, B]: CanBuildFrom[Coll, (A, B), LinkedMap[A, B]] =
     new MapCanBuildFrom[A, B]
 
-  override def empty[A, B]: LinkedMap[A, B] =
+  @inline override def empty[A, B]: LinkedMap[A, B] =
     EmptyMap.asInstanceOf[LinkedMap[A, B]]
 
   class WithDefault[A, +B](underlying: LinkedMap[A, B], d: A => B)
@@ -190,7 +191,7 @@ object LinkedMap extends ImmutableMapFactory[LinkedMap] {
 
         builder.result()
       }
-    override def +[B1 >: B](kv: (A, B1)): LinkedMap[A, B1] =
+    @inline override def +[B1 >: B](kv: (A, B1)): LinkedMap[A, B1] =
       updated(kv._1, kv._2)
     override def -(key: A): LinkedMap[A, B] =
       if (key == key1) new LinkedMap3(key2, value2, key3, value3, key4, value4)

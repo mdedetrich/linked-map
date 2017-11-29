@@ -18,8 +18,8 @@ import scala.collection.parallel.immutable.ParHashMap
 @SerialVersionUID(1858299024439116764L)
 @deprecatedInheritance(
   "The semantics of immutable collections makes inheriting from VectorMap error-prone.")
-class VectorMap[A, +B](private val fields: Vector[A],
-                       private val underlying: HashMap[A, (Int, B)])
+class VectorMap[A, +B](private val fields: Vector[A] = Vector.empty[A],
+                       private val underlying: HashMap[A, (Int, B)] = HashMap.empty[A, (Int, B)])
     extends AbstractMap[A, B]
     with LinkedMap[A, B]
     with Map[A, B]
@@ -43,6 +43,9 @@ class VectorMap[A, +B](private val fields: Vector[A],
         underlying.updated(kv._1, (fields.length + 1, kv._2.asInstanceOf[B])))
     }
   }
+
+  override def + [B1 >: B] (elem1: (A, B1), elem2: (A, B1), elems: (A, B1) *): VectorMap[A, B1] =
+    this + elem1 + elem2 ++ elems
 
   override def ++[B1 >: B](
       xs: GenTraversableOnce[(A, B1)]): VectorMap[A, B1] = {
@@ -148,10 +151,10 @@ object VectorMap extends ImmutableMapFactory[VectorMap] {
   implicit def canBuildFrom[A, B]: CanBuildFrom[Coll, (A, B), LinkedMap[A, B]] =
     new MapCanBuildFrom[A, B]
 
-  override def empty[A, B]: VectorMap[A, B] =
+  @inline override def empty[A, B]: VectorMap[A, B] =
     VectorMap.empty
 
-  override def newBuilder[A, B]: mutable.Builder[(A, B), VectorMap[A, B]] =
+  @inline override def newBuilder[A, B]: mutable.Builder[(A, B), VectorMap[A, B]] =
     new VectorMapBuilder
 }
 
